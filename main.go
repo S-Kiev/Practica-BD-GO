@@ -55,6 +55,19 @@ func main() {
 		fmt.Println(modelo)
 	}
 
+	//Para actualizar registros (Update)
+	modelo = &producto.Modelo{
+		ID:      2,
+		Nombre:  "1Kg Papa",
+		Detalle: "Alta en almidon",
+		Precio:  20,
+	}
+
+	err = servicioProducto.Update(modelo)
+	if err != nil {
+		log.Fatalf("actualizacion del registro de producto: %v", err)
+	}
+
 	//---------------------------------------
 	//Para inicializar todas las otras Tablas
 

@@ -146,3 +146,35 @@ func scanRowProduct(s scanner) (*producto.Modelo, error) {
 
 	return m, nil
 }
+
+// Update implementa la interface producto.Storage
+func (p *PsqlProduct) Update(m *producto.Modelo) error {
+	stmt, err := p.db.Prepare(psqlUpdateProduct)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	res, err := stmt.Exec(
+		m.Nombre,
+		stringToNull(m.Detalle),
+		m.Precio,
+		timeToNull(m.FechaActualizacion),
+		m.ID,
+	)
+	if err != nil {
+		return err
+	}
+
+	filasAfectadas, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if filasAfectadas == 0 {
+		return fmt.Errorf("no existe el producto con id: %d", m.ID)
+	}
+
+	fmt.Println("se actualizó el producto correctamente")
+	return nil
+}

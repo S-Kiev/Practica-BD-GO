@@ -1,6 +1,7 @@
 package producto
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -33,7 +34,7 @@ func (m Modelos) String() string {
 type Storage interface {
 	Migrate() error
 	Create(*Modelo) error
-	//Update(*Modelo) error
+	Update(*Modelo) error
 	GetAll() (Modelos, error)
 	GetByID(uint) (*Modelo, error)
 	//Delete(uint) error
@@ -68,4 +69,19 @@ func (s *Servicio) GetAll() (Modelos, error) {
 // GetByID es usado para obtener un producto especifico
 func (s *Servicio) GetByID(id uint) (*Modelo, error) {
 	return s.storage.GetByID(id)
+}
+
+var (
+	ErrIDNotFound = errors.New("El producto no contiene un ID")
+)
+
+// Update usado para actualizar un producto
+func (s *Servicio) Update(m *Modelo) error {
+	if m.ID == 0 {
+		return ErrIDNotFound
+	}
+
+	m.FechaActualizacion = time.Now()
+
+	return s.storage.Update(m)
 }
