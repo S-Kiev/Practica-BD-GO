@@ -27,6 +27,10 @@ const (
 	psqlDeleteProduct = `DELETE FROM productos WHERE id = $1`
 )
 
+type scanner interface {
+	Scan(dest ...interface{}) error
+}
+
 // psqlProducto usado para trabajar con Postgress - producto
 type PsqlProduct struct {
 	db *sql.DB
@@ -73,4 +77,72 @@ func (p *PsqlProduct) Create(m *producto.Modelo) error {
 
 	fmt.Println("se creo el producto correctamente")
 	return nil
+}
+
+// GetAll implement the interface product.Storage
+func (p *PsqlProduct) GetAll() (producto.Modelos, error) {
+	stmt, err := p.db.Prepare(psqlGetAllProduct)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ms := make(producto.Modelos, 0)
+	for rows.Next() {
+
+		m, err := scanRowProduct(rows)
+		if err != nil {
+			return nil, err
+		}
+
+		ms = append(ms, m)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return ms, nil
+}
+
+// GetByID implementa la interface producto.Storage
+func (p *PsqlProduct) GetByID(id uint) (*producto.Modelo, error) {
+	stmt, err := p.db.Prepare(psqlGetProductByID)
+	if err != nil {
+		return &producto.Modelo{}, err
+	}
+	defer stmt.Close()
+
+	return scanRowProduct(stmt.QueryRow(id))
+}
+
+func scanRowProduct(s scanner) (*producto.Modelo, error) {
+	m := &producto.Modelo{}
+
+	//Si hay segistros que pueden venir nulos de la BD
+	detalleNull := sql.NullString{}
+	fechaActualizacionNull := sql.NullTime{}
+
+	err := s.Scan(
+		&m.ID,
+		&m.Nombre,
+		&m.Precio,
+		&detalleNull,
+		&m.FechaCreacion,
+		&fechaActualizacionNull,
+	)
+	if err != nil {
+		return &producto.Modelo{}, err
+	}
+
+	m.Detalle = detalleNull.String
+	m.FechaActualizacion = fechaActualizacionNull.Time
+
+	return m, nil
 }
