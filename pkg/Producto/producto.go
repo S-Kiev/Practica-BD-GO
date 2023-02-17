@@ -19,10 +19,10 @@ type Modelos []*Modelo
 type Storage interface {
 	Migrate() error
 	Create(*Modelo) error
-	Update(*Modelo) error
-	GetAll() (Modelos, error)
-	GetByID(uint) (*Modelo, error)
-	Delete(uint) error
+	//Update(*Modelo) error
+	//GetAll() (Modelos, error)
+	//GetByID(uint) (*Modelo, error)
+	//Delete(uint) error
 }
 
 // Servicio de Producto
@@ -38,4 +38,10 @@ func NewServicio(s Storage) *Servicio {
 // Migrate es usado para la migracion de producto
 func (s *Servicio) Migrate() error {
 	return s.storage.Migrate()
+}
+
+// Create usado para crear un producto
+func (s *Servicio) Create(m *Modelo) error {
+	m.FechaCreacion = time.Now()
+	return s.storage.Create(m)
 }

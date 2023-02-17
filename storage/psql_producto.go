@@ -3,6 +3,8 @@ package storage
 import (
 	"database/sql"
 	"fmt"
+
+	producto "github.com/S-Kiev/Practica-BD-GO/pkg/Producto"
 )
 
 const (
@@ -48,5 +50,27 @@ func (p *PsqlProduct) Migrate() error {
 	}
 
 	fmt.Println("migración de producto ejecutada correctamente")
+	return nil
+}
+
+// Create implementa la interface Producto.Storage
+func (p *PsqlProduct) Create(m *producto.Modelo) error {
+	stmt, err := p.db.Prepare(psqlCreateProduct)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(
+		m.Nombre,
+		stringToNull(m.Detalle),
+		m.Precio,
+		m.FechaCreacion,
+	).Scan(&m.ID)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("se creo el producto correctamente")
 	return nil
 }
