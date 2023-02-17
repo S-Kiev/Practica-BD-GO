@@ -24,3 +24,18 @@ type Storage interface {
 	GetByID(uint) (*Modelo, error)
 	Delete(uint) error
 }
+
+// Servicio de Producto
+type Servicio struct {
+	storage Storage
+}
+
+// NewServicio retorna un puntero a de Servicio
+func NewServicio(s Storage) *Servicio {
+	return &Servicio{s}
+}
+
+// Migrate es usado para la migracion de producto
+func (s *Servicio) Migrate() error {
+	return s.storage.Migrate()
+}
