@@ -56,6 +56,9 @@ func main() {
 	}
 
 	//Para actualizar registros (Update)
+
+	//A partir de aqui como err ya fue declarada ya no se usa:=
+	//sino que para los ejemplos subsiguientes se asigna =
 	modelo = &producto.Modelo{
 		ID:      2,
 		Nombre:  "1Kg Papa",
@@ -66,6 +69,13 @@ func main() {
 	err = servicioProducto.Update(modelo)
 	if err != nil {
 		log.Fatalf("actualizacion del registro de producto: %v", err)
+	}
+
+	//Para eliminar reguistro (Delete)
+
+	err = servicioProducto.Delete(3)
+	if err != nil {
+		log.Fatalf("eliminación del registro de producto: %v", err)
 	}
 
 	//---------------------------------------

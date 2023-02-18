@@ -178,3 +178,20 @@ func (p *PsqlProduct) Update(m *producto.Modelo) error {
 	fmt.Println("se actualizó el producto correctamente")
 	return nil
 }
+
+// Delete implementa la interface producto.Storage
+func (p *PsqlProduct) Delete(id uint) error {
+	stmt, err := p.db.Prepare(psqlDeleteProduct)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("se eliminó el producto correctamente")
+	return nil
+}
