@@ -1,6 +1,9 @@
 package encabezadofactura
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 // Modelo del Encabezado de Factura
 type Modelo struct {
@@ -13,6 +16,7 @@ type Modelo struct {
 // Interfaz de almacenamiento que debe implementar un almacenamiento db
 type Storage interface {
 	Migrate() error
+	CreateTransaction(*sql.Tx, *Modelo) error
 }
 
 // Servicio de Encabezado

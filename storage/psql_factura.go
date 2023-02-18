@@ -1,0 +1,47 @@
+package storage
+
+import (
+	"database/sql"
+	"fmt"
+
+	encabezadofactura "github.com/S-Kiev/Practica-BD-GO/pkg/EncabezadoFactura"
+	itemfactura "github.com/S-Kiev/Practica-BD-GO/pkg/ItemFactura"
+)
+
+// PsqlFactura usado para trabajar con postgres - factura
+type PsqlFactura struct {
+	db           *sql.DB
+	encabezado   encabezadofactura.Storage
+	itemsFactura itemfactura.Storage
+}
+
+// NewPsqlFactura returna un nuevo puntero de PsqlFactura
+func NewPsqlFactura(db *sql.DB, encabezado encabezadofactura.Storage, item itemfactura.Storage) *PsqlFactura {
+	return &PsqlFactura{
+		db:           db,
+		encabezado:   encabezado,
+		itemsFactura: item,
+	}
+}
+
+// Create implement the interface invoice.Storage
+func (p *PsqlFactura) Create(m *invoice.Model) error {
+	tx, err := p.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	if err := p.storageHeader.CreateTx(tx, m.Header); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("Header: %w", err)
+	}
+	fmt.Printf("Factura creada con id: %d \n", m.Header.ID)
+
+	if err := p.storageItems.CreateTx(tx, m.Header.ID, m.Items); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("Items: %w", err)
+	}
+	fmt.Printf("items creados: %d \n", len(m.Items))
+
+	return tx.Commit()
+}
