@@ -3,6 +3,8 @@ package storage
 import (
 	"database/sql"
 	"fmt"
+
+	encabezadofactura "github.com/S-Kiev/Practica-BD-GO/pkg/EncabezadoFactura"
 )
 
 const (
@@ -40,4 +42,15 @@ func (p *PsqlEncabezadoFactura) Migrate() error {
 
 	fmt.Println("migración de encabezado de factura ejecutada correctamente")
 	return nil
+}
+
+// CreateTx implementa la interface encabezadoFactura.Storage
+func (p *PsqlEncabezadoFactura) CreateTransaction(tx *sql.Tx, encabezado *encabezadofactura.Modelo) error {
+	stmt, err := tx.Prepare(psqlCreateEncabezadoFactura)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	return stmt.QueryRow(encabezado.Cliente).Scan(&encabezado.ID, &encabezado.FechaCreacion)
 }

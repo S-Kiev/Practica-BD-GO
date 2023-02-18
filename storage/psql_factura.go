@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	encabezadofactura "github.com/S-Kiev/Practica-BD-GO/pkg/EncabezadoFactura"
+	factura "github.com/S-Kiev/Practica-BD-GO/pkg/Factura"
 	itemfactura "github.com/S-Kiev/Practica-BD-GO/pkg/ItemFactura"
 )
 
@@ -24,20 +25,20 @@ func NewPsqlFactura(db *sql.DB, encabezado encabezadofactura.Storage, item itemf
 	}
 }
 
-// Create implement the interface invoice.Storage
-func (p *PsqlFactura) Create(m *invoice.Model) error {
-	tx, err := p.db.Begin()
+// Create implementa la interface factura.Storage
+func (f *PsqlFactura) Create(m *factura.Modelo) error {
+	tx, err := f.db.Begin()
 	if err != nil {
 		return err
 	}
 
-	if err := p.storageHeader.CreateTx(tx, m.Header); err != nil {
+	if err := f.encabezado.CreateTransaction(tx, m.Encabezado); err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Header: %w", err)
 	}
-	fmt.Printf("Factura creada con id: %d \n", m.Header.ID)
+	fmt.Printf("Factura creada con id: %d \n", m.Encabezado.ID)
 
-	if err := p.storageItems.CreateTx(tx, m.Header.ID, m.Items); err != nil {
+	if err := f.itemsFactura.CreateTransaction(tx, m.Encabezado.ID, m.Items); err != nil {
 		tx.Rollback()
 		return fmt.Errorf("Items: %w", err)
 	}

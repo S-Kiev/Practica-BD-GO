@@ -8,7 +8,7 @@ import (
 // Modelo de Factura
 type Modelo struct {
 	Encabezado *encabezadofactura.Modelo
-	Items      itemfactura.Modelo
+	Items      itemfactura.Modelos
 }
 
 // Storage interface que debe implementar el almaceniento de BD

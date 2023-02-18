@@ -7,6 +7,7 @@ import (
 	"log"
 
 	encabezadofactura "github.com/S-Kiev/Practica-BD-GO/pkg/EncabezadoFactura"
+	factura "github.com/S-Kiev/Practica-BD-GO/pkg/Factura"
 	itemfactura "github.com/S-Kiev/Practica-BD-GO/pkg/ItemFactura"
 	producto "github.com/S-Kiev/Practica-BD-GO/pkg/Producto"
 	"github.com/S-Kiev/Practica-BD-GO/storage"
@@ -93,6 +94,29 @@ func main() {
 
 	if err := servicioItem.Migrate(); err != nil {
 		log.Fatalf("migracion del item: %v", err)
+	}
+
+	storageFactura := storage.NewPsqlFactura(
+		storage.Pool(),
+		storegeEncabezado,
+		storageItemFactura,
+	)
+
+	//El Modelo de factura tiene un encabezado (el cual a su vez en este caso solo requiere del nombre del cliente)
+	//Y los items que contiene, que es un slice de item
+	facturaPrueba := &factura.Modelo{
+		Encabezado: &encabezadofactura.Modelo{
+			Cliente: "Ezequiel Viera",
+		},
+		Items: itemfactura.Modelos{
+			&itemfactura.Modelo{ProductoID: 1},
+			&itemfactura.Modelo{ProductoID: 2},
+		},
+	}
+
+	servicioFactura := factura.NewService(storageFactura)
+	if err := servicioFactura.Create(facturaPrueba); err != nil {
+		log.Fatalf("error al crear la factura: %v", err)
 	}
 
 }

@@ -3,6 +3,8 @@ package storage
 import (
 	"database/sql"
 	"fmt"
+
+	itemfactura "github.com/S-Kiev/Practica-BD-GO/pkg/ItemFactura"
 )
 
 const (
@@ -42,5 +44,26 @@ func (p *PsqlItemFactura) Migrate() error {
 	}
 
 	fmt.Println("migración de item de factura ejecutada correctamente")
+	return nil
+}
+
+// CreateTransaction implementa la interface itemFactura.Storage
+func (p *PsqlItemFactura) CreateTransaction(tx *sql.Tx, encabezadoID uint, ms itemfactura.Modelos) error {
+	stmt, err := tx.Prepare(psqlCreateItemFactura)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, item := range ms {
+		err = stmt.QueryRow(encabezadoID, item.ProductoID).Scan(
+			&item.ID,
+			&item.FechaCreacion,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
