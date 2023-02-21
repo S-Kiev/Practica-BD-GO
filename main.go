@@ -1,19 +1,53 @@
 package main
 
 import (
-	"database/sql"
-	"errors"
-	"fmt"
 	"log"
 
 	encabezadofactura "github.com/S-Kiev/Practica-BD-GO/pkg/EncabezadoFactura"
-	factura "github.com/S-Kiev/Practica-BD-GO/pkg/Factura"
 	itemfactura "github.com/S-Kiev/Practica-BD-GO/pkg/ItemFactura"
 	producto "github.com/S-Kiev/Practica-BD-GO/pkg/Producto"
 	"github.com/S-Kiev/Practica-BD-GO/storage"
 )
 
+/*"database/sql"
+"errors"
+"fmt"
+
+encabezadofactura "github.com/S-Kiev/Practica-BD-GO/pkg/EncabezadoFactura"
+factura "github.com/S-Kiev/Practica-BD-GO/pkg/Factura"
+itemfactura "github.com/S-Kiev/Practica-BD-GO/pkg/ItemFactura"
+producto "github.com/S-Kiev/Practica-BD-GO/pkg/Producto"
+"github.com/S-Kiev/Practica-BD-GO/storage"
+*/
+
 func main() {
+	storage.NewMySQLDB()
+
+	storageProducto := storage.NewMySQLProducto(storage.Pool())
+	servicioProducto := producto.NewServicio(storageProducto)
+
+	//Hacer Migracion (Crear Tablas)
+	if err := servicioProducto.Migrate(); err != nil {
+		log.Fatalf("migracion del producto: %v", err)
+	}
+
+	storegeEncabezado := storage.NewMySQLEncabezadoFactura(storage.Pool())
+	servicioEncabezado := encabezadofactura.NewServicio(storegeEncabezado)
+
+	if err := servicioEncabezado.Migrate(); err != nil {
+		log.Fatalf("migracion del producto: %v", err)
+	}
+
+	storageItemFactura := storage.NewMySQLItemFactura(storage.Pool())
+	servicioItem := itemfactura.NewServicio(storageItemFactura)
+
+	if err := servicioItem.Migrate(); err != nil {
+		log.Fatalf("migracion del item: %v", err)
+	}
+
+}
+
+/*
 	//Iniciar BD
 	storage.NewPostgresDB()
 
@@ -118,5 +152,4 @@ func main() {
 	if err := servicioFactura.Create(facturaPrueba); err != nil {
 		log.Fatalf("error al crear la factura: %v", err)
 	}
-
-}
+*/

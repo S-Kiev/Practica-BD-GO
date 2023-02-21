@@ -2,7 +2,7 @@ package storage
 
 import (
 	"database/sql"
-	"fmt"
+	//"fmt"
 
 	encabezadofactura "github.com/S-Kiev/Practica-BD-GO/pkg/EncabezadoFactura"
 	factura "github.com/S-Kiev/Practica-BD-GO/pkg/Factura"
@@ -32,17 +32,17 @@ func (f *PsqlFactura) Create(m *factura.Modelo) error {
 		return err
 	}
 
-	if err := f.encabezado.CreateTransaction(tx, m.Encabezado); err != nil {
-		tx.Rollback()
-		return fmt.Errorf("Header: %w", err)
-	}
-	fmt.Printf("Factura creada con id: %d \n", m.Encabezado.ID)
-
-	if err := f.itemsFactura.CreateTransaction(tx, m.Encabezado.ID, m.Items); err != nil {
-		tx.Rollback()
-		return fmt.Errorf("Items: %w", err)
-	}
-	fmt.Printf("items creados: %d \n", len(m.Items))
+	//	if err := f.encabezado.CreateTransaction(tx, m.Encabezado); err != nil {
+	//		tx.Rollback()
+	//		return fmt.Errorf("Header: %w", err)
+	//	}
+	//	fmt.Printf("Factura creada con id: %d \n", m.Encabezado.ID)
+	//
+	//	if err := f.itemsFactura.CreateTransaction(tx, m.Encabezado.ID, m.Items); err != nil {
+	//		tx.Rollback()
+	//		return fmt.Errorf("Items: %w", err)
+	//	}
+	//	fmt.Printf("items creados: %d \n", len(m.Items))
 
 	return tx.Commit()
 }

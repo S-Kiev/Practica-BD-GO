@@ -8,6 +8,8 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -50,4 +52,22 @@ func timeToNull(t time.Time) sql.NullTime {
 		null.Valid = true
 	}
 	return null
+}
+
+// Apartir de aqui sera para MySQL
+
+func NewMySQLDB() {
+	once.Do(func() {
+		var err error
+		db, err = sql.Open("mysql", "S-Kiev:sakura1997@tcp(localhost:3306)/bd-cursogo?parseTime=true")
+		if err != nil {
+			log.Fatalf("No se pudo conectar con la Base de Datos: %v", err)
+		}
+
+		if err = db.Ping(); err != nil {
+			log.Fatalf("No se pudo hacer ping: %v", err)
+		}
+
+		fmt.Println("conectado a MySQL")
+	})
 }
