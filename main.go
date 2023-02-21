@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"log"
+
 	producto "github.com/S-Kiev/Practica-BD-GO/pkg/Producto"
 	"github.com/S-Kiev/Practica-BD-GO/storage"
 )
@@ -54,6 +57,14 @@ func main() {
 		}
 	*/
 
+	//Obtener todos los registros (GetAll)
+
+	modelos, err := servicioProducto.GetAll()
+	if err != nil {
+		log.Fatalf("obtencion de todos los reguistros de producto: %v", err)
+	}
+
+	fmt.Println(modelos)
 }
 
 /*

@@ -17,9 +17,8 @@ const (
 		fechaModificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)`
 	mysqlCreateProduct = `INSERT INTO productos(nombre, detalle, precio, fechaCreacion) VALUES(?, ?, ?, ?)`
-	mysqlGetAllProduct = `SELECT id, nombre, detalle, precio,
-	fechaCreacion, fechaModificacion
-	FROM productos`
+	mysqlGetAllProduct = `SELECT id, nombre, detalle, precio, 
+	fechaCreacion, fechaModificacion FROM productos`
 
 	/*
 		psqlGetAllProduct = `SELECT id, nombre, detalle, precio,
@@ -104,7 +103,7 @@ func (p *MySQLProducto) GetAll() (producto.Modelos, error) {
 	ms := make(producto.Modelos, 0)
 	for rows.Next() {
 
-		m, err := scanRowProduct(rows)
+		m, err := scanRowProductMySQL(rows)
 		if err != nil {
 			return nil, err
 		}
@@ -117,4 +116,22 @@ func (p *MySQLProducto) GetAll() (producto.Modelos, error) {
 	}
 
 	return ms, nil
+}
+
+func scanRowProductMySQL(row *sql.Rows) (*producto.Modelo, error) {
+	m := &producto.Modelo{}
+	var detalle []byte
+	fechaActualizacionNull := sql.NullTime{}
+	err := row.Scan(
+		&m.ID,
+		&m.Nombre,
+		&detalle,
+		&m.Precio,
+		&m.FechaCreacion,
+		&fechaActualizacionNull)
+	if err != nil {
+		return nil, err
+	}
+	m.Detalle = string(detalle)
+	return m, nil
 }
