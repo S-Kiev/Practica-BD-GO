@@ -1,10 +1,6 @@
 package main
 
 import (
-	"log"
-
-	encabezadofactura "github.com/S-Kiev/Practica-BD-GO/pkg/EncabezadoFactura"
-	itemfactura "github.com/S-Kiev/Practica-BD-GO/pkg/ItemFactura"
 	producto "github.com/S-Kiev/Practica-BD-GO/pkg/Producto"
 	"github.com/S-Kiev/Practica-BD-GO/storage"
 )
@@ -26,24 +22,37 @@ func main() {
 	storageProducto := storage.NewMySQLProducto(storage.Pool())
 	servicioProducto := producto.NewServicio(storageProducto)
 
-	//Hacer Migracion (Crear Tablas)
-	if err := servicioProducto.Migrate(); err != nil {
-		log.Fatalf("migracion del producto: %v", err)
-	}
+	/*
+			//Hacer Migracion (Crear Tablas)
+			if err := servicioProducto.Migrate(); err != nil {
+				log.Fatalf("migracion del producto: %v", err)
+			}
 
-	storegeEncabezado := storage.NewMySQLEncabezadoFactura(storage.Pool())
-	servicioEncabezado := encabezadofactura.NewServicio(storegeEncabezado)
+			storegeEncabezado := storage.NewMySQLEncabezadoFactura(storage.Pool())
+			servicioEncabezado := encabezadofactura.NewServicio(storegeEncabezado)
 
-	if err := servicioEncabezado.Migrate(); err != nil {
-		log.Fatalf("migracion del producto: %v", err)
-	}
+			if err := servicioEncabezado.Migrate(); err != nil {
+				log.Fatalf("migracion del producto: %v", err)
+			}
 
-	storageItemFactura := storage.NewMySQLItemFactura(storage.Pool())
-	servicioItem := itemfactura.NewServicio(storageItemFactura)
+			storageItemFactura := storage.NewMySQLItemFactura(storage.Pool())
+			servicioItem := itemfactura.NewServicio(storageItemFactura)
 
-	if err := servicioItem.Migrate(); err != nil {
-		log.Fatalf("migracion del item: %v", err)
-	}
+			if err := servicioItem.Migrate(); err != nil {
+				log.Fatalf("migracion del item: %v", err)
+			}
+
+
+		//Insertar Producto (Create)
+		p := &producto.Modelo{
+			Nombre: "Papas Fritas",
+			Precio: 400,
+		}
+
+		if err := servicioProducto.Create(p); err != nil {
+			log.Fatalf("insercion de producto: %v", err)
+		}
+	*/
 
 }
 

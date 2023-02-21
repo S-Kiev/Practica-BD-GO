@@ -39,9 +39,9 @@ func (m Modelos) String() string {
 // Interfaz de almacenamiento que debe implementar un almacenamiento db
 type Storage interface {
 	Migrate() error
-	//Create(*Modelo) error
+	Create(*Modelo) error
 	//Update(*Modelo) error
-	//GetAll() (Modelos, error)
+	GetAll() (Modelos, error)
 	//GetByID(uint) (*Modelo, error)
 	//Delete(uint) error
 }
@@ -62,15 +62,15 @@ func (s *Servicio) Migrate() error {
 }
 
 // Create usado para crear un producto
-//func (s *Servicio) Create(m *Modelo) error {
-//	m.FechaCreacion = time.Now()
-//	return s.storage.Create(m)
-//}
+func (s *Servicio) Create(m *Modelo) error {
+	m.FechaCreacion = time.Now()
+	return s.storage.Create(m)
+}
 
 // GetAll usado para obtener todos los productos
-//func (s *Servicio) GetAll() (Modelos, error) {
-//	return s.storage.GetAll()
-//}
+func (s *Servicio) GetAll() (Modelos, error) {
+	return s.storage.GetAll()
+}
 
 // GetByID es usado para obtener un producto especifico
 //func (s *Servicio) GetByID(id uint) (*Modelo, error) {

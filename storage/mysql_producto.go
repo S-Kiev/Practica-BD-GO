@@ -3,7 +3,8 @@ package storage
 import (
 	"database/sql"
 	"fmt"
-	//producto "github.com/S-Kiev/Practica-BD-GO/pkg/Producto"
+
+	producto "github.com/S-Kiev/Practica-BD-GO/pkg/Producto"
 )
 
 const (
@@ -15,8 +16,12 @@ const (
 		fechaCreacion TIMESTAMP NOT NULL DEFAULT now(),
 		fechaModificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)`
+	mysqlCreateProduct = `INSERT INTO productos(nombre, detalle, precio, fechaCreacion) VALUES(?, ?, ?, ?)`
+	mysqlGetAllProduct = `SELECT id, nombre, detalle, precio,
+	fechaCreacion, fechaModificacion
+	FROM productos`
+
 	/*
-		psqlCreateProduct = `INSERT INTO productos(nombre, detalle, precio, fechaCreacion) VALUES($1, $2, $3, $4) RETURNING id`
 		psqlGetAllProduct = `SELECT id, nombre, detalle, precio,
 		fechaCreacion, fechaModificacion
 		FROM productos`
@@ -51,4 +56,65 @@ func (p *MySQLProducto) Migrate() error {
 
 	fmt.Println("migración de producto ejecutada correctamente")
 	return nil
+}
+
+// Create implementa la interface Producto.Storage
+func (p *MySQLProducto) Create(m *producto.Modelo) error {
+	stmt, err := p.db.Prepare(mysqlCreateProduct)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	resultado, err := stmt.Exec(
+		m.Nombre,
+		stringToNull(m.Detalle),
+		m.Precio,
+		m.FechaCreacion,
+	)
+	if err != nil {
+		return err
+	}
+
+	id, err := resultado.LastInsertId()
+	if err != nil {
+		return err
+	}
+
+	m.ID = uint(id)
+
+	fmt.Printf("se creo el producto correctamente con el id: %d\n", m.ID)
+	return nil
+}
+
+// GetAll implementa la interface product.Storage
+func (p *MySQLProducto) GetAll() (producto.Modelos, error) {
+	stmt, err := p.db.Prepare(mysqlGetAllProduct)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ms := make(producto.Modelos, 0)
+	for rows.Next() {
+
+		m, err := scanRowProduct(rows)
+		if err != nil {
+			return nil, err
+		}
+
+		ms = append(ms, m)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return ms, nil
 }

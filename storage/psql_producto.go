@@ -79,7 +79,7 @@ func (p *PsqlProduct) Create(m *producto.Modelo) error {
 	return nil
 }
 
-// GetAll implement the interface product.Storage
+// GetAll implementa la interface product.Storage
 func (p *PsqlProduct) GetAll() (producto.Modelos, error) {
 	stmt, err := p.db.Prepare(psqlGetAllProduct)
 	if err != nil {
