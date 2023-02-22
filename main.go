@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -55,6 +57,7 @@ func main() {
 		if err := servicioProducto.Create(p); err != nil {
 			log.Fatalf("insercion de producto: %v", err)
 		}
+
 	*/
 
 	//Obtener todos los registros (GetAll)
@@ -65,6 +68,19 @@ func main() {
 	}
 
 	fmt.Println(modelos)
+
+	//Obtener un registro por ID (GetById)
+
+	modelo, err := servicioProducto.GetByID(1)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		fmt.Println("No hay un producto con ese id")
+	case err != nil:
+		log.Fatalf("obtencion de del reguistro de producto: %v", err)
+	default:
+		fmt.Println(modelo)
+	}
+
 }
 
 /*

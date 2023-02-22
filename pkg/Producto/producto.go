@@ -42,7 +42,7 @@ type Storage interface {
 	Create(*Modelo) error
 	//Update(*Modelo) error
 	GetAll() (Modelos, error)
-	//GetByID(uint) (*Modelo, error)
+	GetByID(uint) (*Modelo, error)
 	//Delete(uint) error
 }
 
@@ -73,9 +73,9 @@ func (s *Servicio) GetAll() (Modelos, error) {
 }
 
 // GetByID es usado para obtener un producto especifico
-//func (s *Servicio) GetByID(id uint) (*Modelo, error) {
-//	return s.storage.GetByID(id)
-//}
+func (s *Servicio) GetByID(id uint) (*Modelo, error) {
+	return s.storage.GetByID(id)
+}
 
 //var (
 //	ErrIDNotFound = errors.New("El producto no contiene un ID")

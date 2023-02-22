@@ -27,10 +27,6 @@ const (
 	psqlDeleteProduct = `DELETE FROM productos WHERE id = $1`
 )
 
-type scanner interface {
-	Scan(dest ...interface{}) error
-}
-
 // psqlProducto usado para trabajar con Postgress - producto
 type PsqlProduct struct {
 	db *sql.DB
@@ -133,7 +129,7 @@ func scanRowProduct(s scanner) (*producto.Modelo, error) {
 		&m.ID,
 		&m.Nombre,
 		&m.Precio,
-		&detalleNull,
+		&detalleNull.String,
 		&m.FechaCreacion,
 		&fechaActualizacionNull,
 	)
@@ -141,8 +137,13 @@ func scanRowProduct(s scanner) (*producto.Modelo, error) {
 		return &producto.Modelo{}, err
 	}
 
-	m.Detalle = detalleNull.String
-	m.FechaActualizacion = fechaActualizacionNull.Time
+	if detalleNull.Valid { // Verifica si el valor es válido antes de asignarlo
+		m.Detalle = detalleNull.String
+	}
+
+	if fechaActualizacionNull.Valid { // Verifica si el valor es válido antes de asignarlo
+		m.FechaActualizacion = fechaActualizacionNull.Time
+	}
 
 	return m, nil
 }

@@ -19,17 +19,19 @@ const (
 	mysqlCreateProduct = `INSERT INTO productos(nombre, detalle, precio, fechaCreacion) VALUES(?, ?, ?, ?)`
 	mysqlGetAllProduct = `SELECT id, nombre, detalle, precio, 
 	fechaCreacion, fechaModificacion FROM productos`
+	mysqlGetProductByID = psqlGetAllProduct + " WHERE id = ?"
 
 	/*
-		psqlGetAllProduct = `SELECT id, nombre, detalle, precio,
-		fechaCreacion, fechaModificacion
-		FROM productos`
-		psqlGetProductByID = psqlGetAllProduct + " WHERE id = $1"
+
 		psqlUpdateProduct  = `UPDATE productos SET nombre = $1, detalle = $2,
 		precio = $3, fechaModificacion = $4 WHERE id = $5`
 		psqlDeleteProduct = `DELETE FROM productos WHERE id = $1`
 	*/
 )
+
+type scanner interface {
+	Scan(dest ...interface{}) error
+}
 
 // MySQLProductoo usado para trabajar con MySQL - producto
 type MySQLProducto struct {
@@ -103,7 +105,7 @@ func (p *MySQLProducto) GetAll() (producto.Modelos, error) {
 	ms := make(producto.Modelos, 0)
 	for rows.Next() {
 
-		m, err := scanRowProductMySQL(rows)
+		m, err := scanRowProducto(rows)
 		if err != nil {
 			return nil, err
 		}
@@ -118,7 +120,40 @@ func (p *MySQLProducto) GetAll() (producto.Modelos, error) {
 	return ms, nil
 }
 
-func scanRowProductMySQL(row *sql.Rows) (*producto.Modelo, error) {
+// GetByID implementa la interface producto.Storage
+func (p *MySQLProducto) GetByID(id uint) (*producto.Modelo, error) {
+	stmt, err := p.db.Prepare(mysqlGetProductByID)
+	if err != nil {
+		return &producto.Modelo{}, err
+	}
+	defer stmt.Close()
+
+	return scanRowProducto(stmt.QueryRow(id))
+}
+
+func scanRowProducto(scan scanner) (*producto.Modelo, error) {
+	m := &producto.Modelo{}
+	var detalle []byte
+	fechaActualizacionNull := sql.NullTime{}
+	err := scan.Scan(
+		&m.ID,
+		&m.Nombre,
+		&detalle,
+		&m.Precio,
+		&m.FechaCreacion,
+		&fechaActualizacionNull,
+	)
+	if err != nil {
+		return nil, err
+	}
+	m.Detalle = string(detalle)
+	return m, nil
+}
+
+/*
+VERSIONES ANTERIORES DE SCANNER
+
+func scanRowProductMySQLForRows(row *sql.Rows) (*producto.Modelo, error) {
 	m := &producto.Modelo{}
 	var detalle []byte
 	fechaActualizacionNull := sql.NullTime{}
@@ -128,10 +163,32 @@ func scanRowProductMySQL(row *sql.Rows) (*producto.Modelo, error) {
 		&detalle,
 		&m.Precio,
 		&m.FechaCreacion,
-		&fechaActualizacionNull)
+		&fechaActualizacionNull,
+	)
 	if err != nil {
 		return nil, err
 	}
 	m.Detalle = string(detalle)
 	return m, nil
 }
+
+func scanRowProductMySQLForRow(row *sql.Row) (*producto.Modelo, error) {
+	m := &producto.Modelo{}
+	var detalle []byte
+	fechaActualizacionNull := sql.NullTime{}
+	err := row.Scan(
+		&m.ID,
+		&m.Nombre,
+		&detalle,
+		&m.Precio,
+		&m.FechaCreacion,
+		&fechaActualizacionNull,
+	)
+	if err != nil {
+		return nil, err
+	}
+	m.Detalle = string(detalle)
+	return m, nil
+}
+
+*/
