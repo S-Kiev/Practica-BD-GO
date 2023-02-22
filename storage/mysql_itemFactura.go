@@ -3,7 +3,8 @@ package storage
 import (
 	"database/sql"
 	"fmt"
-	//itemfactura "github.com/S-Kiev/Practica-BD-GO/pkg/ItemFactura"
+
+	itemfactura "github.com/S-Kiev/Practica-BD-GO/pkg/ItemFactura"
 )
 
 const (
@@ -16,9 +17,8 @@ const (
 		CONSTRAINT item_factura_encabezado_factura_id_fk FOREIGN KEY (encabezado_factura_id) REFERENCES encabezado_factura (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
 		CONSTRAINT item_factura_producto_id_fk FOREIGN KEY (producto_id) REFERENCES productos (id) ON UPDATE RESTRICT ON DELETE RESTRICT
 	)`
-	/*
-		psqlCreateItemFactura = `INSERT INTO item_factura(cliente) VALUES($1) RETURNING id, fechaCreacion`
-	*/
+
+	mysqlCreateItemFactura = `INSERT INTO item_factura(encabezado_factura_id, producto_id) VALUES(?, ?)`
 )
 
 // MySQLItemFactura usado para trabajar con MySQL - item de factura
@@ -44,5 +44,32 @@ func (p *MySQLItemFactura) Migrate() error {
 	}
 
 	fmt.Println("migración de item de factura ejecutada correctamente")
+	return nil
+}
+
+// CreateTransaction implementa la interface itemFactura.Storage
+func (p *MySQLItemFactura) CreateTransaction(tx *sql.Tx, encabezadoID uint, ms itemfactura.Modelos) error {
+	stmt, err := tx.Prepare(mysqlCreateItemFactura)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, item := range ms {
+
+		resultado, err := stmt.Exec(encabezadoID, item.ProductoID)
+		if err != nil {
+			return err
+		}
+
+		id, err := resultado.LastInsertId()
+		if err != nil {
+			return err
+		}
+
+		item.ID = uint(id)
+
+	}
+
 	return nil
 }

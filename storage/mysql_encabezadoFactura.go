@@ -3,7 +3,8 @@ package storage
 import (
 	"database/sql"
 	"fmt"
-	//encabezadofactura "github.com/S-Kiev/Practica-BD-GO/pkg/EncabezadoFactura"
+
+	encabezadofactura "github.com/S-Kiev/Practica-BD-GO/pkg/EncabezadoFactura"
 )
 
 const (
@@ -13,9 +14,8 @@ const (
 		fechaCreacion TIMESTAMP NOT NULL DEFAULT now(),
 		fechaModificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	)`
-	/*
-		psqlCreateEncabezadoFactura = `INSERT INTO encabezado_factura(cliente) VALUES($1) RETURNING id, fechaCreacion`
-	*/
+
+	mysqlCreateEncabezadoFactura = `INSERT INTO encabezado_factura(clinete) VALUES(?)`
 )
 
 // MySQLEncabezadoFactura es usado para trabajar con MySQL - encabezado
@@ -41,5 +41,28 @@ func (p *MySQLEncabezadoFactura) Migrate() error {
 	}
 
 	fmt.Println("migración de encabezado de factura ejecutada correctamente")
+	return nil
+}
+
+// CreateTx implementa la interface encabezadoFactura.Storage
+func (p *MySQLEncabezadoFactura) CreateTransaction(tx *sql.Tx, encabezado *encabezadofactura.Modelo) error {
+	stmt, err := tx.Prepare(mysqlCreateEncabezadoFactura)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	resultado, err := stmt.Exec(encabezado.Cliente)
+	if err != nil {
+		return err
+	}
+
+	id, err := resultado.LastInsertId()
+	if err != nil {
+		return err
+	}
+
+	encabezado.ID = uint(id)
+
 	return nil
 }

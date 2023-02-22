@@ -18,7 +18,7 @@ const (
 		CONSTRAINT item_factura_encabezado_factura_id_fk FOREIGN KEY (encabezado_factura_id) REFERENCES encabezado_factura (id) ON UPDATE RESTRICT ON DELETE RESTRICT,
 		CONSTRAINT item_factura_producto_id_fk FOREIGN KEY (producto_id) REFERENCES productos (id) ON UPDATE RESTRICT ON DELETE RESTRICT
 	)`
-	psqlCreateItemFactura = `INSERT INTO item_factura(cliente) VALUES($1) RETURNING id, fechaCreacion`
+	psqlCreateItemFactura = `INSERT INTO item_factura(encabezado_factura_id, producto_id) VALUES($1, $2) RETURNING id, fechaCreacion`
 )
 
 // PsqlItemFactura usado para trabajar con Postgress - item de factura

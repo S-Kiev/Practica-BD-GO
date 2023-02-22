@@ -9,16 +9,16 @@ import (
 	itemfactura "github.com/S-Kiev/Practica-BD-GO/pkg/ItemFactura"
 )
 
-// PsqlFactura usado para trabajar con postgres - factura
-type PsqlFactura struct {
+// MySQLFactura usado para trabajar con postgres - factura
+type MySQLFactura struct {
 	db           *sql.DB
 	encabezado   encabezadofactura.Storage
 	itemsFactura itemfactura.Storage
 }
 
-// NewPsqlFactura returna un nuevo puntero de PsqlFactura
-func NewPsqlFactura(db *sql.DB, encabezado encabezadofactura.Storage, item itemfactura.Storage) *PsqlFactura {
-	return &PsqlFactura{
+// NewMySQLFactura returna un nuevo puntero de MySQLFactura
+func NewMySQLFactura(db *sql.DB, encabezado encabezadofactura.Storage, item itemfactura.Storage) *MySQLFactura {
+	return &MySQLFactura{
 		db:           db,
 		encabezado:   encabezado,
 		itemsFactura: item,
@@ -26,7 +26,7 @@ func NewPsqlFactura(db *sql.DB, encabezado encabezadofactura.Storage, item itemf
 }
 
 // Create implementa la interface factura.Storage
-func (f *PsqlFactura) Create(m *factura.Modelo) error {
+func (f *MySQLFactura) Create(m *factura.Modelo) error {
 	tx, err := f.db.Begin()
 	if err != nil {
 		return err

@@ -1,7 +1,7 @@
 package itemfactura
 
 import (
-	//"database/sql"
+	"database/sql"
 	"time"
 )
 
@@ -20,7 +20,7 @@ type Modelos []*Modelo
 // Interfaz de almacenamiento que debe implementar un almacenamiento db
 type Storage interface {
 	Migrate() error
-	//	CreateTransaction(*sql.Tx, uint, Modelos) error
+	CreateTransaction(*sql.Tx, uint, Modelos) error
 }
 
 // Servicio de Item
