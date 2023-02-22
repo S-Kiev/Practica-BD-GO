@@ -28,17 +28,6 @@ func main() {
 
 	//A partir de aqui como err ya fue declarada ya no se usa:=
 	//sino que para los ejemplos subsiguientes se asigna =
-	modelo := &producto.Modelo{
-		ID:      1,
-		Nombre:  "1Kg Papa",
-		Detalle: "Alta en almidon",
-		Precio:  20,
-	}
-
-	err := servicioProducto.Update(modelo)
-	if err != nil {
-		log.Fatalf("actualizacion del registro de producto: %v", err)
-	}
 
 	/*
 				//Hacer Migracion (Crear Tablas)
@@ -95,6 +84,13 @@ func main() {
 		}
 
 	*/
+
+	//Para eliminar reguistro (Delete)
+
+	err := servicioProducto.Delete(2)
+	if err != nil {
+		log.Fatalf("eliminación del registro de producto: %v", err)
+	}
 
 }
 

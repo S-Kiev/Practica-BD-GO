@@ -22,12 +22,7 @@ const (
 	mysqlGetProductByID = psqlGetAllProduct + " WHERE id = ?"
 	mysqlUpdateProduct  = `UPDATE productos SET nombre = ?, detalle = ?,
 	precio = ?, fechaModificacion = ? WHERE id = ?`
-
-	/*
-
-
-		psqlDeleteProduct = `DELETE FROM productos WHERE id = $1`
-	*/
+	mysqlDeleteProduct = `DELETE FROM productos WHERE id = ?`
 )
 
 type scanner interface {
@@ -180,6 +175,23 @@ func (p *MySQLProducto) Update(m *producto.Modelo) error {
 	}
 
 	fmt.Println("se actualizó el producto correctamente")
+	return nil
+}
+
+// Delete implementa la interface producto.Storage
+func (p *MySQLProducto) Delete(id uint) error {
+	stmt, err := p.db.Prepare(mysqlDeleteProduct)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("se eliminó el producto correctamente")
 	return nil
 }
 
