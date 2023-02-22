@@ -1,9 +1,6 @@
 package main
 
 import (
-	"database/sql"
-	"errors"
-	"fmt"
 	"log"
 
 	producto "github.com/S-Kiev/Practica-BD-GO/pkg/Producto"
@@ -27,59 +24,77 @@ func main() {
 	storageProducto := storage.NewMySQLProducto(storage.Pool())
 	servicioProducto := producto.NewServicio(storageProducto)
 
+	//Para actualizar registros (Update)
+
+	//A partir de aqui como err ya fue declarada ya no se usa:=
+	//sino que para los ejemplos subsiguientes se asigna =
+	modelo := &producto.Modelo{
+		ID:      1,
+		Nombre:  "1Kg Papa",
+		Detalle: "Alta en almidon",
+		Precio:  20,
+	}
+
+	err := servicioProducto.Update(modelo)
+	if err != nil {
+		log.Fatalf("actualizacion del registro de producto: %v", err)
+	}
+
 	/*
-			//Hacer Migracion (Crear Tablas)
-			if err := servicioProducto.Migrate(); err != nil {
-				log.Fatalf("migracion del producto: %v", err)
+				//Hacer Migracion (Crear Tablas)
+				if err := servicioProducto.Migrate(); err != nil {
+					log.Fatalf("migracion del producto: %v", err)
+				}
+
+				storegeEncabezado := storage.NewMySQLEncabezadoFactura(storage.Pool())
+				servicioEncabezado := encabezadofactura.NewServicio(storegeEncabezado)
+
+				if err := servicioEncabezado.Migrate(); err != nil {
+					log.Fatalf("migracion del producto: %v", err)
+				}
+
+				storageItemFactura := storage.NewMySQLItemFactura(storage.Pool())
+				servicioItem := itemfactura.NewServicio(storageItemFactura)
+
+				if err := servicioItem.Migrate(); err != nil {
+					log.Fatalf("migracion del item: %v", err)
+				}
+
+
+			//Insertar Producto (Create)
+			p := &producto.Modelo{
+				Nombre: "Papas Fritas",
+				Precio: 400,
 			}
 
-			storegeEncabezado := storage.NewMySQLEncabezadoFactura(storage.Pool())
-			servicioEncabezado := encabezadofactura.NewServicio(storegeEncabezado)
-
-			if err := servicioEncabezado.Migrate(); err != nil {
-				log.Fatalf("migracion del producto: %v", err)
-			}
-
-			storageItemFactura := storage.NewMySQLItemFactura(storage.Pool())
-			servicioItem := itemfactura.NewServicio(storageItemFactura)
-
-			if err := servicioItem.Migrate(); err != nil {
-				log.Fatalf("migracion del item: %v", err)
+			if err := servicioProducto.Create(p); err != nil {
+				log.Fatalf("insercion de producto: %v", err)
 			}
 
 
-		//Insertar Producto (Create)
-		p := &producto.Modelo{
-			Nombre: "Papas Fritas",
-			Precio: 400,
+
+		//Obtener todos los registros (GetAll)
+
+		modelos, err := servicioProducto.GetAll()
+		if err != nil {
+			log.Fatalf("obtencion de todos los reguistros de producto: %v", err)
 		}
 
-		if err := servicioProducto.Create(p); err != nil {
-			log.Fatalf("insercion de producto: %v", err)
+		fmt.Println(modelos)
+
+		//Obtener un registro por ID (GetById)
+
+		modelo, err := servicioProducto.GetByID(1)
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			fmt.Println("No hay un producto con ese id")
+		case err != nil:
+			log.Fatalf("obtencion de del reguistro de producto: %v", err)
+		default:
+			fmt.Println(modelo)
 		}
 
 	*/
-
-	//Obtener todos los registros (GetAll)
-
-	modelos, err := servicioProducto.GetAll()
-	if err != nil {
-		log.Fatalf("obtencion de todos los reguistros de producto: %v", err)
-	}
-
-	fmt.Println(modelos)
-
-	//Obtener un registro por ID (GetById)
-
-	modelo, err := servicioProducto.GetByID(1)
-	switch {
-	case errors.Is(err, sql.ErrNoRows):
-		fmt.Println("No hay un producto con ese id")
-	case err != nil:
-		log.Fatalf("obtencion de del reguistro de producto: %v", err)
-	default:
-		fmt.Println(modelo)
-	}
 
 }
 

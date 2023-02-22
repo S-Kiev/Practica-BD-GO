@@ -20,11 +20,12 @@ const (
 	mysqlGetAllProduct = `SELECT id, nombre, detalle, precio, 
 	fechaCreacion, fechaModificacion FROM productos`
 	mysqlGetProductByID = psqlGetAllProduct + " WHERE id = ?"
+	mysqlUpdateProduct  = `UPDATE productos SET nombre = ?, detalle = ?,
+	precio = ?, fechaModificacion = ? WHERE id = ?`
 
 	/*
 
-		psqlUpdateProduct  = `UPDATE productos SET nombre = $1, detalle = $2,
-		precio = $3, fechaModificacion = $4 WHERE id = $5`
+
 		psqlDeleteProduct = `DELETE FROM productos WHERE id = $1`
 	*/
 )
@@ -148,6 +149,38 @@ func scanRowProducto(scan scanner) (*producto.Modelo, error) {
 	}
 	m.Detalle = string(detalle)
 	return m, nil
+}
+
+// Update implementa la interface producto.Storage
+func (p *MySQLProducto) Update(m *producto.Modelo) error {
+	stmt, err := p.db.Prepare(mysqlUpdateProduct)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	res, err := stmt.Exec(
+		m.Nombre,
+		stringToNull(m.Detalle),
+		m.Precio,
+		timeToNull(m.FechaActualizacion),
+		m.ID,
+	)
+	if err != nil {
+		return err
+	}
+
+	filasAfectadas, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if filasAfectadas == 0 {
+		return fmt.Errorf("no existe el producto con id: %d", m.ID)
+	}
+
+	fmt.Println("se actualizó el producto correctamente")
+	return nil
 }
 
 /*
