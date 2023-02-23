@@ -29,17 +29,17 @@ type scanner interface {
 	Scan(dest ...interface{}) error
 }
 
-// MySQLProductoo usado para trabajar con MySQL - producto
-type MySQLProducto struct {
+// mySQLProductoo usado para trabajar con MySQL - producto
+type mySQLProducto struct {
 	db *sql.DB
 }
 
-// newMySQLProducto retorna un nuevo puntero a MySQLProducto
-func NewMySQLProducto(db *sql.DB) *MySQLProducto {
-	return &MySQLProducto{db}
+// newmySQLProducto retorna un nuevo puntero a mySQLProducto
+func newMySQLProducto(db *sql.DB) *mySQLProducto {
+	return &mySQLProducto{db}
 }
 
-func (p *MySQLProducto) Migrate() error {
+func (p *mySQLProducto) Migrate() error {
 	stmt, err := p.db.Prepare(MySQLMigrateProduct)
 	if err != nil {
 		return err
@@ -56,7 +56,7 @@ func (p *MySQLProducto) Migrate() error {
 }
 
 // Create implementa la interface Producto.Storage
-func (p *MySQLProducto) Create(m *producto.Modelo) error {
+func (p *mySQLProducto) Create(m *producto.Modelo) error {
 	stmt, err := p.db.Prepare(mysqlCreateProduct)
 	if err != nil {
 		return err
@@ -85,7 +85,7 @@ func (p *MySQLProducto) Create(m *producto.Modelo) error {
 }
 
 // GetAll implementa la interface product.Storage
-func (p *MySQLProducto) GetAll() (producto.Modelos, error) {
+func (p *mySQLProducto) GetAll() (producto.Modelos, error) {
 	stmt, err := p.db.Prepare(mysqlGetAllProduct)
 	if err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func (p *MySQLProducto) GetAll() (producto.Modelos, error) {
 }
 
 // GetByID implementa la interface producto.Storage
-func (p *MySQLProducto) GetByID(id uint) (*producto.Modelo, error) {
+func (p *mySQLProducto) GetByID(id uint) (*producto.Modelo, error) {
 	stmt, err := p.db.Prepare(mysqlGetProductByID)
 	if err != nil {
 		return &producto.Modelo{}, err
@@ -147,7 +147,7 @@ func scanRowProducto(scan scanner) (*producto.Modelo, error) {
 }
 
 // Update implementa la interface producto.Storage
-func (p *MySQLProducto) Update(m *producto.Modelo) error {
+func (p *mySQLProducto) Update(m *producto.Modelo) error {
 	stmt, err := p.db.Prepare(mysqlUpdateProduct)
 	if err != nil {
 		return err
@@ -179,7 +179,7 @@ func (p *MySQLProducto) Update(m *producto.Modelo) error {
 }
 
 // Delete implementa la interface producto.Storage
-func (p *MySQLProducto) Delete(id uint) error {
+func (p *mySQLProducto) Delete(id uint) error {
 	stmt, err := p.db.Prepare(mysqlDeleteProduct)
 	if err != nil {
 		return err

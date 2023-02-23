@@ -28,16 +28,16 @@ const (
 )
 
 // psqlProducto usado para trabajar con Postgress - producto
-type PsqlProduct struct {
+type psqlProduct struct {
 	db *sql.DB
 }
 
-// newPsqlProduct retorna un nuevo puntero a PsqlProduct
-func NewPsqlProduct(db *sql.DB) *PsqlProduct {
-	return &PsqlProduct{db}
+// newpsqlProduct retorna un nuevo puntero a psqlProduct
+func newPsqlProduct(db *sql.DB) *psqlProduct {
+	return &psqlProduct{db}
 }
 
-func (p *PsqlProduct) Migrate() error {
+func (p *psqlProduct) Migrate() error {
 	stmt, err := p.db.Prepare(psqlMigrateProduct)
 	if err != nil {
 		return err
@@ -54,7 +54,7 @@ func (p *PsqlProduct) Migrate() error {
 }
 
 // Create implementa la interface Producto.Storage
-func (p *PsqlProduct) Create(m *producto.Modelo) error {
+func (p *psqlProduct) Create(m *producto.Modelo) error {
 	stmt, err := p.db.Prepare(psqlCreateProduct)
 	if err != nil {
 		return err
@@ -76,7 +76,7 @@ func (p *PsqlProduct) Create(m *producto.Modelo) error {
 }
 
 // GetAll implementa la interface product.Storage
-func (p *PsqlProduct) GetAll() (producto.Modelos, error) {
+func (p *psqlProduct) GetAll() (producto.Modelos, error) {
 	stmt, err := p.db.Prepare(psqlGetAllProduct)
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func (p *PsqlProduct) GetAll() (producto.Modelos, error) {
 }
 
 // GetByID implementa la interface producto.Storage
-func (p *PsqlProduct) GetByID(id uint) (*producto.Modelo, error) {
+func (p *psqlProduct) GetByID(id uint) (*producto.Modelo, error) {
 	stmt, err := p.db.Prepare(psqlGetProductByID)
 	if err != nil {
 		return &producto.Modelo{}, err
@@ -149,7 +149,7 @@ func scanRowProduct(s scanner) (*producto.Modelo, error) {
 }
 
 // Update implementa la interface producto.Storage
-func (p *PsqlProduct) Update(m *producto.Modelo) error {
+func (p *psqlProduct) Update(m *producto.Modelo) error {
 	stmt, err := p.db.Prepare(psqlUpdateProduct)
 	if err != nil {
 		return err
@@ -181,7 +181,7 @@ func (p *PsqlProduct) Update(m *producto.Modelo) error {
 }
 
 // Delete implementa la interface producto.Storage
-func (p *PsqlProduct) Delete(id uint) error {
+func (p *psqlProduct) Delete(id uint) error {
 	stmt, err := p.db.Prepare(psqlDeleteProduct)
 	if err != nil {
 		return err
